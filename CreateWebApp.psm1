@@ -173,6 +173,7 @@ $PropertiesObject = @{
     token= "467146d20939af4f7d4af0acf0cec6a5cdaa169e";
     repoUrl = $gitrepo;
     branch = "master";
+    IsManualIntegration = true 
 }
 
 Set-AzureRMResource -PropertyObject $PropertiesObject -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/slots/sourcecontrols -ResourceName $webappname/staging/web -ApiVersion 2015-08-01 -Force
