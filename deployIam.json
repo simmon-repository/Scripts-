@@ -1,0 +1,35 @@
+{
+"Deployment": [
+  {
+    "webappname": "B2CdemoWebApp",
+    "repo":"https://github.com/Azure-Samples/active-directory-b2c-dotnet-webapp-and-webapi.git",
+    "ResourceGroupName": "az-prd-westus2-b2c-devauth",
+    "webappnamePlan": "ASP",
+    "AppTypeTier ": "free",
+    "location": "West US"
+
+  },
+
+  {
+    "SubscriptionId": "0dc5cce7-ec33-4359-9ba3-d7a74685d984"
+
+
+  },
+  {
+
+    "TenantId": "6855a1b4-3816-43d2-bf35-178317e72fb0"
+
+  },
+
+  {
+
+    "SubscriptionName": "IAM-b2c-prod"
+  }   
+
+
+
+]
+    
+    }
+
+
