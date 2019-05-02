@@ -1,0 +1,70 @@
+
+
+# Let’s assume that you already have an existing web app in Azure under a subscription, 
+#and you have logged in powershell and set azure resource manager context. 
+#Now, first step is to get existing web app inside a variable so that we can work on it during later steps.  
+#For this, we can use below code:
+
+$webAppName = “metavrse01”
+
+$resourceGroupName = “metavrse-webapps-rg”
+
+# $webAppName is the name of azure web app in reference and $resourceGroupName is the name of resource group which contains web app.
+#Then we can use cmdlet Get-AzureRmWebApp to get web app:
+
+$webApp = Get-AzureRmWebApp -ResourceGroupName $resourceGroupName -Name $webAppName
+
+## to view setting  
+
+$webApp.SiteConfig.AppSettings 
+
+
+# app settings are basically key value pairs, we would need to store new settings using a hashtable first. 
+# Let’s define an hashtable as below: $newAppSettings = @{“newSetting01″=”newValue01″;”newSetting02″=”newValue02″;”newSetting03″=”newValue03”}
+
+
+#  to apply the settings to Azure Web App using below command:  
+
+Set-AzureRmWebApp -AppSettings $newAppSettings -Name $webAppName -ResourceGroupName $resourceGroupName
+
+# let’s fetch existing app settings the same as previous and store inside a variable:
+
+$appSettings = $webapp.SiteConfig.AppSettings
+
+
+# We can then run a loop to convert it into a hashtable:
+
+$newAppSettings = @{}
+ForEach ($item in $appSettings) {
+$newAppSettings[$item.Name] = $item.Value
+}
+
+
+# we can modify existing values and new values using hashtable syntax. For example, in our case like below:
+
+$newAppSettings.WEBSITE_NODE_DEFAULT_VERSION = “6.9”
+$newAppSettings[‘newAppSetting01’] = “newSettingValue01”
+$newAppSettings[‘newAppSetting02’] = “newSettingValue02”
+
+
+# And finally, we can set it using Set-AzureRMWebApp cmdlet 
+
+#----------------------------------------------
+
+$myResourceGroup = 'PartsUnlimitedMRP'
+$mySite = 'centpartsunlimited'
+
+$webApp = Get-AzureRMWebAppSlot -ResourceGroupName $myResourceGroup -Name $mySite -Slot production
+$appSettingList = $webApp.SiteConfig.AppSettings
+
+$hash = @{}
+ForEach ($kvp in $appSettingList) {
+    $hash[$kvp.Name] = $kvp.Value
+}
+
+$hash['NewKey'] = "NewValue"
+$hash['ExistingKey'] = "NewValue"
+
+Set-AzureRMWebAppSlot -ResourceGroupName $myResourceGroup -Name $mySite -AppSettings $hash -Slot production
+
+#-----------------------------------------------
