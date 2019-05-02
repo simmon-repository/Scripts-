@@ -1,0 +1,76 @@
+
+
+## Site extension operations
+
+# Example call: ListWebAppSiteExtensions MyResourceGroup MySite
+Function ListWebAppSiteExtensions($ResourceGroupName, $SiteName)
+{
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName -ApiVersion $WebAppApiVersion -IsCollection
+}
+
+# Example call: InstallSiteExtension MyResourceGroup MySite filecounter
+Function InstallSiteExtension($ResourceGroupName, $SiteName, $Name)
+{
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName/$Name -PropertyObject @{} -ApiVersion $WebAppApiVersion -Force
+}
+
+# Example call: UninstallSiteExtension MyResourceGroup MySite filecounter
+Function UninstallSiteExtension($ResourceGroupName, $SiteName, $Name)
+{
+    Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName/$Name -ApiVersion $WebAppApiVersion -Force
+}
+
+
+## Certificate operations
+
+# Example call: UploadCert MyResourceGroup "North Europe" foo.pfx "MyPassword!" MyTestCert
+
+Function UploadCert($ResourceGroupName, $Location, $PfxPath, $PfxPassword, $CertName)
+{
+    # Read the raw bytes of the pfx file
+    $pfxBytes = get-content $PfxPath -Encoding Byte
+
+    $props = @{
+        PfxBlob = [System.Convert]::ToBase64String($pfxBytes)
+        Password = $PfxPassword
+    }
+
+    New-AzureRmResource -Location $Location -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/certificates -Name $CertName -PropertyObject $props -ApiVersion $WebAppApiVersion -Force
+}
+
+# Example call: DeleteCert MyResourceGroup MyCert
+Function DeleteCert($ResourceGroupName, $CertName)
+{
+    Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/certificates -Name $CertName -ApiVersion $WebAppApiVersion -Force
+}
+
+
+## Premium Add-Ons
+
+Function GetWebAppAddons($ResourceGroupName, $SiteName)
+{
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName -ApiVersion $WebAppApiVersion -IsCollection
+}
+
+Function AddZrayAddon($ResourceGroupName, $Location, $SiteName, $Name, $PlanName)
+{
+    $plan = @{
+        name = $PlanName
+        publisher = "zend-technologies"
+        product = "z-ray"
+    }
+
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -Properties @{} -PlanObject $plan -ApiVersion $WebAppApiVersion -Force
+}
+
+Function RemoveWebAppAddon($ResourceGroupName, $SiteName, $Name)
+{
+    Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -ApiVersion $WebAppApiVersion -Force
+}
+
+## Sync repository
+
+Function SyncWebApp($ResourceGroupName, $SiteName)
+{
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName  -Action sync -ApiVersion $WebAppApiVersion -Force
+}
