@@ -1,0 +1,47 @@
+Function Set-ApplicationSettingConfigProperty
+{
+    param (
+        [parameter(Mandatory = $true)][ValidateScript ({Test-Path $_})][string] $PathToConfigFile,
+        [parameter(Mandatory = $true)][string] $PropertyName,
+        [parameter(Mandatory = $true)][string] $PropertyValue,
+        [Parameter(Mandatory = $false)][Validatescript ({(Get-Service $_) -ne $null})][string] $NameOfServiceToRestart = $null)
+    
+    $configurationAppSettingXmlPath = "//configuration/appSettings"
+
+    [xml] $configurationDocument = Get-Content $PathToConfigFile
+    $appSettingsNode = $configurationDocument.SelectSingleNode($configurationAppSettingXmlPath)
+    
+    if($appSettingsNode -eq $null)
+    {
+        $(throw "App Settings Does not Exists! Invalid Configuration File.")
+    }
+
+    $nodeToUpdate = $configurationDocument.SelectSingleNode($configurationAppSettingXmlPath+"/add[@key='$PropertyName']")
+    if($nodeToUpdate -ne $null)
+    {
+        Write-Host "[$PropertyName] Already exists, Removing it to re-set its value."
+        $removedElement = $appSettingsNode.RemoveChild($nodeToUpdate)
+    }
+
+    Write-Host "Creating new Configuration Node."
+    $newPropertyNode = $configurationDocument.CreateNode("element", "add","")
+
+    Write-Host "Setting Node Attributes."
+    $newPropertyNode.SetAttribute("key", $PropertyName)
+    $newPropertyNode.SetAttribute("value", $PropertyValue)
+    
+    Write-Host "Appending Child to AppSettings."
+    $appSettingsNode = $configurationDocument.SelectSingleNode($configurationAppSettingXmlPath).AppendChild($newPropertyNode)
+    
+    Write-Host "Adding new property into the configuration file."
+    $configurationDocument.Save($PathToConfigFile)
+
+    Write-Host "Property was Successfully Updated."
+
+    if([string]::IsNullOrWhiteSpace($NameOfServiceToRestart) -eq $false)
+    {
+        Write-Host "Service [$NameOfServiceToRestart] was defined.., Restarting it"
+        Restart-Service -Name $NameOfServiceToRestart 
+        Write-Host "Service was Restarted..."
+    }
+}
