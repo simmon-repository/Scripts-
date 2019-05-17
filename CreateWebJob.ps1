@@ -89,7 +89,5 @@ Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceName $AppServ
 
 #Start/Stop the Webjobs
 
-Invoke-AzureRmResourceAction -ApiVersion $Apiversion  -ResourceGroupName $ResourceGroupName -ResourceName $ResourceName -ResourceType microsoft.web/sites/$WebjobType -Action start/stop  -Force
+#Invoke-AzureRmResourceAction -ApiVersion $Apiversion  -ResourceGroupName $ResourceGroupName -ResourceName $ResourceName -ResourceType microsoft.web/sites/$WebjobType -Action start/stop  -Force
 
-#Delete a Webjob
-Remove-AzureRmResource -ApiVersion $Apiversion  -ResourceGroupName $ResourceGroupName -ResourceName $ResourceName -ResourceType
